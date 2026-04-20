@@ -19,7 +19,9 @@ dependencies = [
     "matplotlib>=3.9.0",
     "meshcat==0.3.2",
     # "unitree_sdk2py @ git+https://github.com/unitreerobotics/unitree_sdk2_python.git@master",
-    "logging_mp"
+    "logging_mp",
+    "mujoco>=3.0.0",
+    "rerun-sdk>=0.22.0",
 ]
 
 [tool.setuptools]

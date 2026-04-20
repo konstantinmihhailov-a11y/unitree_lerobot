@@ -5,11 +5,15 @@ from typing import Any
 import rerun as rr
 import rerun.blueprint as rrb
 
+_Scalar = getattr(rr, "Scalar", None) or rr.Scalars
+
 
 class RerunLogger:
     """
     A fully automatic Rerun logger designed to parse and visualize step
     dictionaries directly from a LeRobotDataset.
+
+    Supports optional named joints and torque visualization for MuJoCo replay.
     """
 
     def __init__(
@@ -17,25 +21,35 @@ class RerunLogger:
         prefix: str = "",
         memory_limit: str = "200MB",
         idxrangeboundary: int | None = 300,
+        joint_names: list[str] | None = None,
     ):
-        """Initializes the Rerun logger."""
-        # Use a descriptive name for the Rerun recording
+        """Initializes the Rerun logger.
+
+        Args:
+            joint_names: If provided, used instead of generic joint_0..N labels.
+        """
         rr.init(f"Dataset_Log_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
         rr.spawn(memory_limit=memory_limit)
 
         self.prefix = prefix
         self.blueprint_sent = False
         self.idxrangeboundary = idxrangeboundary
+        self.joint_names = joint_names
 
-        # --- Internal cache for discovered keys ---
         self._image_keys: tuple[str, ...] = ()
         self._state_key: str = ""
         self._action_key: str = ""
+        self._torque_key: str = ""
         self._index_key: str = "index"
         self._task_key: str = "task"
         self._episode_index_key: str = "episode_index"
 
         self.current_episode = -1
+
+    def _joint_label(self, i: int) -> str:
+        if self.joint_names and i < len(self.joint_names):
+            return self.joint_names[i]
+        return f"joint_{i}"
 
     def _initialize_from_data(self, step_data: dict[str, Any]):
         """Inspects the first data dictionary to discover components and set up the blueprint."""
@@ -49,6 +63,8 @@ class RerunLogger:
                 self._state_key = key
             elif key == "action":
                 self._action_key = key
+            elif key == "torque":
+                self._torque_key = key
 
         self._image_keys = tuple(sorted(image_keys))
 
@@ -60,9 +76,19 @@ class RerunLogger:
         print(f"  - Using '{self._index_key}' for time sequence.")
         print(f"  - Detected State Key: '{self._state_key}'")
         print(f"  - Detected Action Key: '{self._action_key}'")
+        print(f"  - Detected Torque Key: '{self._torque_key}'")
         print(f"  - Detected Image Keys: {self._image_keys}")
         if self.idxrangeboundary:
             self.setup_blueprint()
+
+    def _make_time_range(self) -> list[rrb.VisibleTimeRange]:
+        return [
+            rrb.VisibleTimeRange(
+                "frame",
+                start=rrb.TimeRangeBoundary.cursor_relative(seq=-self.idxrangeboundary),
+                end=rrb.TimeRangeBoundary.cursor_relative(),
+            )
+        ]
 
     def setup_blueprint(self):
         """Sets up and sends the Rerun blueprint based on detected components."""
@@ -79,13 +105,7 @@ class RerunLogger:
                 rrb.TimeSeriesView(
                     origin=entity_path,
                     name="Observation State",
-                    time_ranges=[
-                        rrb.VisibleTimeRange(
-                            "frame",
-                            start=rrb.TimeRangeBoundary.cursor_relative(seq=-self.idxrangeboundary),
-                            end=rrb.TimeRangeBoundary.cursor_relative(),
-                        )
-                    ],
+                    time_ranges=self._make_time_range(),
                     plot_legend=rrb.PlotLegend(visible=True),
                 )
             )
@@ -96,13 +116,18 @@ class RerunLogger:
                 rrb.TimeSeriesView(
                     origin=entity_path,
                     name="Action",
-                    time_ranges=[
-                        rrb.VisibleTimeRange(
-                            "frame",
-                            start=rrb.TimeRangeBoundary.cursor_relative(seq=-self.idxrangeboundary),
-                            end=rrb.TimeRangeBoundary.cursor_relative(),
-                        )
-                    ],
+                    time_ranges=self._make_time_range(),
+                    plot_legend=rrb.PlotLegend(visible=True),
+                )
+            )
+
+        if self._torque_key:
+            entity_path = f"{self.prefix}torque"
+            views.append(
+                rrb.TimeSeriesView(
+                    origin=entity_path,
+                    name="Torque",
+                    time_ranges=self._make_time_range(),
                     plot_legend=rrb.PlotLegend(visible=True),
                 )
             )
@@ -121,15 +146,18 @@ class RerunLogger:
             self._initialize_from_data(step_data)
 
         if self._index_key in step_data:
-            current_index = step_data[self._index_key].item()
+            idx_val = step_data[self._index_key]
+            current_index = idx_val.item() if hasattr(idx_val, "item") else int(idx_val)
             rr.set_time_sequence("frame", current_index)
 
-        episode_idx = step_data.get(self._episode_index_key, torch.tensor(-1)).item()
-        if episode_idx != self.current_episode:
-            self.current_episode = episode_idx
-            task_name = step_data.get(self._task_key, "Unknown Task")
-            log_text = f"Starting Episode {self.current_episode}: {task_name}"
-            rr.log(f"{self.prefix}info/task", rr.TextLog(log_text, level=rr.TextLogLevel.INFO))
+        episode_idx_val = step_data.get(self._episode_index_key)
+        if episode_idx_val is not None:
+            episode_idx = episode_idx_val.item() if hasattr(episode_idx_val, "item") else int(episode_idx_val)
+            if episode_idx != self.current_episode:
+                self.current_episode = episode_idx
+                task_name = step_data.get(self._task_key, "Unknown Task")
+                log_text = f"Starting Episode {self.current_episode}: {task_name}"
+                rr.log(f"{self.prefix}info/task", rr.TextLog(log_text, level=rr.TextLogLevel.INFO))
 
         for key in self._image_keys:
             if key in step_data:
@@ -145,13 +173,22 @@ class RerunLogger:
             state_tensor = step_data[self._state_key]
             entity_path = f"{self.prefix}state"
             for i, val in enumerate(state_tensor):
-                rr.log(f"{entity_path}/joint_{i}", rr.Scalar(val.item()))
+                label = self._joint_label(i)
+                rr.log(f"{entity_path}/{label}", _Scalar(val.item()))
 
         if self._action_key in step_data:
             action_tensor = step_data[self._action_key]
             entity_path = f"{self.prefix}action"
             for i, val in enumerate(action_tensor):
-                rr.log(f"{entity_path}/joint_{i}", rr.Scalar(val.item()))
+                label = self._joint_label(i)
+                rr.log(f"{entity_path}/{label}", _Scalar(val.item()))
+
+        if self._torque_key and self._torque_key in step_data:
+            torque_tensor = step_data[self._torque_key]
+            entity_path = f"{self.prefix}torque"
+            for i, val in enumerate(torque_tensor):
+                label = self._joint_label(i)
+                rr.log(f"{entity_path}/{label}", _Scalar(val.item()))
 
 
 def visualization_data(idx, observation, state, action, online_logger):
