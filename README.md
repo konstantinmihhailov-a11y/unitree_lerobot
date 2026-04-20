@@ -89,14 +89,14 @@ cd unitree_sdk2_python  && pip install -e .
 ## 2.1 🖼️ Load Datasets
 
 If you want to directly load the dataset we have already recorded,
-Load the [`unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket`](https://huggingface.co/datasets/unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket) dataset from Hugging Face. The default download location is `~/.cache/huggingface/lerobot/unitreerobotics`. If you want to load data from a local source, please change the `root` parameter.
+Load the [`Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket`](https://huggingface.co/datasets/Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket) dataset from Hugging Face. The default download location is `~/.cache/huggingface/lerobot/unitreerobotics`. If you want to load data from a local source, please change the `root` parameter.
 
 ```python
 from lerobot.datasets.lerobot_dataset import LeRobotDataset
 import tqdm
 
 episode_index = 1
-dataset = LeRobotDataset(repo_id="unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket")
+dataset = LeRobotDataset(repo_id="Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket")
 
 from_idx = dataset.meta.episodes["dataset_from_index"][episode_index]
 to_idx = dataset.meta.episodes["dataset_to_index"][episode_index]
@@ -111,7 +111,7 @@ for step_idx in tqdm.tqdm(range(from_idx, to_idx)):
 cd unitree_lerobot/lerobot
 
 python src/lerobot/scripts/lerobot_dataset_viz.py \
-    --repo-id unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --repo-id Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --episode-index 0
 ```
 
@@ -209,7 +209,7 @@ python unitree_lerobot/utils/convert_unitree_json_to_lerobot.py \
 cd unitree_lerobot/lerobot
 
 python src/lerobot/scripts/lerobot_train.py \
-    --dataset.repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --dataset.repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --policy.push_to_hub=false \
     --policy.type=act
 ```
@@ -220,7 +220,7 @@ python src/lerobot/scripts/lerobot_train.py \
 cd unitree_lerobot/lerobot
 
 python src/lerobot/scripts/lerobot_train.py\
-    --dataset.repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --dataset.repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --policy.push_to_hub=false \
     --policy.type=diffusion
 ```
@@ -231,7 +231,7 @@ python src/lerobot/scripts/lerobot_train.py\
 cd unitree_lerobot/lerobot
 
 python src/lerobot/scripts/lerobot_train.py \
-    --dataset.repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --dataset.repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --policy.push_to_hub=false \
     --policy.type=pi0
 ```
@@ -242,7 +242,7 @@ python src/lerobot/scripts/lerobot_train.py \
 cd unitree_lerobot/lerobot
 
 python src/lerobot/scripts/lerobot_train.py \
-    --dataset.repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --dataset.repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --policy.type=pi05 \
     --output_dir=./outputs/pi05_training \
     --job_name=pi05_training \
@@ -260,7 +260,7 @@ python src/lerobot/scripts/lerobot_train.py \
 cd unitree_lerobot/lerobot
 
 python src/lerobot/scripts/lerobot_train.py \
-    --dataset.repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --dataset.repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --output_dir=./outputs/groot_training \
     --policy.push_to_hub=false \
     --policy.type=groot \
@@ -291,7 +291,7 @@ To test your trained model on a real robot, you can use the eval_g1.py script lo
 
 python unitree_lerobot/eval_robot/eval_g1.py  \
     --policy.path=unitree_lerobot/lerobot/outputs/train/2025-03-25/22-11-16_diffusion/checkpoints/100000/pretrained_model \
-    --repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --root="" \
     --episodes=0 \
     --frequency=30 \
@@ -307,7 +307,7 @@ If you want to run inference tests in the unitree_sim_isaaclab simulation enviro
 
 python unitree_lerobot/eval_robot/eval_g1_sim.py  \
     --policy.path=unitree_lerobot/lerobot/outputs/train/2025-03-25/22-11-16_diffusion/checkpoints/100000/pretrained_model \
-    --repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --root="" \
     --episodes=0 \
     --frequency=30 \
@@ -321,7 +321,7 @@ python unitree_lerobot/eval_robot/eval_g1_sim.py  \
 # If you want to evaluate the model's performance on the dataset, use the command below for testing
 python unitree_lerobot/eval_robot/eval_g1_dataset.py  \
     --policy.path=unitree_lerobot/lerobot/outputs/train/2025-03-25/22-11-16_diffusion/checkpoints/100000/pretrained_model \
-    --repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --root="" \
     --episodes=0 \
     --frequency=30 \
@@ -340,7 +340,7 @@ It is useful for testing and validating the robot's behavior using pre-recorded 
 
 ```bash
 
-# --repo_id         Dataset repository ID on Hugging Face Hub (e.g., unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket)
+# --repo_id         Dataset repository ID on Hugging Face Hub (e.g., Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket)
 # --root            Path to the root directory of the dataset (leave empty to use the default cache path)
 # --episodes        Index of the episode to replay (e.g., 0 for the first episode)
 # --frequency       Replay frequency in Hz (e.g., 30 for 30 frames per second)
@@ -349,7 +349,7 @@ It is useful for testing and validating the robot's behavior using pre-recorded 
 # --visualization   Enable or disable visualization during replay (true for enabling, false for disabling)
 
 python unitree_lerobot/eval_robot/replay_robot.py \
-    --repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --root="" \
     --episodes=0 \
     --frequency=30 \

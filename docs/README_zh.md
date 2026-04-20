@@ -66,14 +66,14 @@ cd unitree_sdk2_python  && pip install -e .
 
 ## 2.1 🖼️ 数据加载测试
 
-如果你想加载我们已经录制好的数据集, 你可以从 huggingface 上加载 [`unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket`](https://huggingface.co/datasets/unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket) 数据集, 默认下载到`~/.cache/huggingface/lerobot/unitreerobotics`. 如果想从加载本地数据请更改 `root` 参数
+如果你想加载我们已经录制好的数据集, 你可以从 huggingface 上加载 [`Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket`](https://huggingface.co/datasets/Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket) 数据集, 默认下载到`~/.cache/huggingface/lerobot/unitreerobotics`. 如果想从加载本地数据请更改 `root` 参数
 
 ```python
 from lerobot.datasets.lerobot_dataset import LeRobotDataset
 import tqdm
 
 episode_index = 1
-dataset = LeRobotDataset(repo_id="unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket")
+dataset = LeRobotDataset(repo_id="Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket")
 
 from_idx = dataset.meta.episodes["dataset_from_index"][episode_index]
 to_idx = dataset.meta.episodes["dataset_to_index"][episode_index]
@@ -88,7 +88,7 @@ for step_idx in tqdm.tqdm(range(from_idx, to_idx)):
 cd unitree_lerobot/lerobot
 
 python src/lerobot/scripts/lerobot_dataset_viz.py \
-    --repo-id unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --repo-id Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --episode-index 0
 ```
 
@@ -183,7 +183,7 @@ python unitree_lerobot/utils/convert_unitree_json_to_lerobot.py
 cd unitree_lerobot/lerobot
 
 python src/lerobot/scripts/train.py \
-    --dataset.repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --dataset.repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --policy.push_to_hub=false \
     --policy.type=act
 ```
@@ -194,7 +194,7 @@ python src/lerobot/scripts/train.py \
 cd unitree_lerobot/lerobot
 
 python src/lerobot/scripts/train.py \
-    --dataset.repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --dataset.repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --policy.push_to_hub=false \
     --policy.type=diffusion
 ```
@@ -205,7 +205,7 @@ python src/lerobot/scripts/train.py \
 cd unitree_lerobot/lerobot
 
 python src/lerobot/scripts/train.py \
-    --dataset.repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --dataset.repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --policy.push_to_hub=false \
     --policy.type=pi0
 ```
@@ -216,7 +216,7 @@ python src/lerobot/scripts/train.py \
 cd unitree_lerobot/lerobot
 
 python src/lerobot/scripts/lerobot_train.py \
-    --dataset.repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --dataset.repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --policy.type=pi05 \
     --output_dir=./outputs/pi05_training \
     --job_name=pi05_training \
@@ -234,7 +234,7 @@ python src/lerobot/scripts/lerobot_train.py \
 cd unitree_lerobot/lerobot
 
 python src/lerobot/scripts/lerobot_train.py \
-    --dataset.repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --dataset.repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --output_dir=./outputs/groot_training \
     --policy.push_to_hub=false \
     --policy.type=groot \
@@ -262,7 +262,7 @@ python src/lerobot/scripts/lerobot_train.py \
 
 python unitree_lerobot/eval_robot/eval_g1.py  \
     --policy.path=unitree_lerobot/lerobot/outputs/train/2025-03-25/22-11-16_diffusion/checkpoints/100000/pretrained_model \
-    --repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --root="" \
     --episodes=0 \
     --frequency=30 \
@@ -276,7 +276,7 @@ python unitree_lerobot/eval_robot/eval_g1.py  \
 # --max_episodes： 每一次最多推理的次数，超过次次数默认任务执行失败
 python unitree_lerobot/eval_robot/eval_g1_sim.py  \
     --policy.path=unitree_lerobot/lerobot/outputs/train/2025-03-25/22-11-16_diffusion/checkpoints/100000/pretrained_model \
-    --repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --root="" \
     --episodes=0 \
     --frequency=30 \
@@ -290,7 +290,7 @@ python unitree_lerobot/eval_robot/eval_g1_sim.py  \
 # If you want to evaluate the model's performance on the dataset, use the command below for testing
 python unitree_lerobot/eval_robot/eval_g1_dataset.py  \
     --policy.path=unitree_lerobot/lerobot/outputs/train/2025-03-25/22-11-16_diffusion/checkpoints/100000/pretrained_model \
-    --repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --root="" \
     --episodes=0 \
     --frequency=30 \
@@ -308,7 +308,7 @@ python unitree_lerobot/eval_robot/eval_g1_dataset.py  \
 
 ```bash
 
-# --repo_id         Hugging Face Hub 上的数据集仓库 ID（例如：unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket）
+# --repo_id         Hugging Face Hub 上的数据集仓库 ID（例如：Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket）
 # --root            数据集根目录路径（留空则使用默认的缓存路径）
 # --episodes        要重放的轨迹索引（例如：0 表示第一个轨迹）
 # --frequency       重放频率，单位 Hz（例如：30 表示每秒 30 帧）
@@ -317,7 +317,7 @@ python unitree_lerobot/eval_robot/eval_g1_dataset.py  \
 # --visualization   是否在重放时启用可视化（true 表示启用，false 表示禁用）
 
 python unitree_lerobot/eval_robot/replay_robot.py \
-    --repo_id=unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
+    --repo_id=Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket \
     --root="" \
     --episodes=0 \
     --frequency=30 \

@@ -76,7 +76,7 @@ JOINT_LABELS: list[str] = [
 
 @dataclass
 class ReplayConfig:
-    repo_id: str = "unitreerobotics/G1_WBT_Inspire_Put_Vegetables_Into_Basket"
+    repo_id: str = "Kon-prosus/G1_WBT_Inspire_Put_Vegetables_Into_Basket"
     episode: int = 0
     frequency: float = 30.0
     mjcf_path: str = str(DEFAULT_MJCF)
