@@ -10,3 +10,13 @@ cam_right_wrist.jpg
 cam_left_wrist.jpg
 data/
 ./data
+
+# Training outputs
+outputs/
+checkpoints/
+wandb/
+converted_dataset/
+*.pt
+*.pth
+*.safetensors
+*.ckpt
